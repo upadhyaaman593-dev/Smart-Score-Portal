@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Marks</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #eef2f3; }
+        .form-box { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; }
+        button { width: 100%; padding: 10px; background: #27ae60; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <h2>📤 Teacher Portal</h2>
+        {% if message %}<p style="color:green;">{{ message }}</p>{% endif %}
+        <form method="POST">
+            <input type="text" name="roll_no" placeholder="Roll Number" required>
+            <input type="text" name="name" placeholder="Student Name" required>
+            <input type="number" name="maths" placeholder="Maths">
+            <input type="number" name="science" placeholder="Science">
+            <input type="number" name="english" placeholder="English">
+            <input type="number" name="hindi" placeholder="Hindi">
+            <input type="number" name="sst" placeholder="SST">
+            <button type="submit">Submit Marks</button>
+        </form>
+        <br>
+        <a href="/">Go to Result Page</a>
+    </div>
+</body>
+</html>
