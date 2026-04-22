@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial; background: #f4f4f4; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 10px; max-width: 900px; margin: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #3498db; color: white; }
+        .btn-delete { background: #e74c3c; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    {% if not authorized %}
+    <form method="POST" style="text-align:center; padding:50px;">
+        <h2>🔒 Admin Login</h2>
+        <input type="password" name="password" placeholder="Password" required><br><br>
+        <button type="submit" style="padding:10px 20px; background:green; color:white; border:none;">Login</button>
+    </form>
+    {% else %}
+    <h2>👨‍🏫 All Students Results</h2>
+    <div style="overflow-x:auto;">
+        <table>
+            <tr><th>Roll No</th><th>Name</th><th>Total</th><th>Percentage</th><th>Status</th><th>Action</th></tr>
+            {% for s in results %}
+            <tr>
+                <td>{{ s.roll_no }}</td>
+                <td>{{ s.name }}</td>
+                <td>{{ s.total }}</td>
+                <td>{{ s.percentage }}</td>
+                <td>{{ s.status }}</td>
+                <td><a href="/delete/{{ s.roll_no }}" class="btn-delete" onclick="return confirm('Delete karein?')">🗑️ Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>
