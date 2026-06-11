@@ -4,17 +4,33 @@ import os
 
 app = Flask(__name__)
 
-# Railway PostgreSQL Connection Setup
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+# --- मजबूत डेटाबेस कनेक्शन सेटअप ---
+# रेलवे के सभी संभावित वेरिएबल्स को चेक करना
+DATABASE_URL = (
+    os.environ.get('DATABASE_URL') or 
+    os.environ.get('POSTGRES_URL') or 
+    os.environ.get('POSTGRESQL_URL')
+)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL or 'sqlite:///database.db'
+if DATABASE_URL:
+    # 1. SQLAlchemy 1.4+ के लिए postgres:// को postgresql:// में बदलना
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    
+    # 2. बिना psycopg2 के डायरेक्ट कनेक्शन के लिए pg8000 ड्राइवर का उपयोग
+    if "postgresql://" in DATABASE_URL and "+pg8000" not in DATABASE_URL:
+        DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+pg8000://", 1)
+        
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+else:
+    # बैकअप के लिए लोकल SQLite (अगर रेलवे का वेरिएबल न मिले)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db = SQLAlchemy(app)
 
-# Database Table Structure
+
+# --- डेटाबेस टेबल स्ट्रक्चर ---
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     roll_no = db.Column(db.String(20), unique=True, nullable=False)
@@ -28,7 +44,8 @@ class Student(db.Model):
     percentage = db.Column(db.String(10))
     status = db.Column(db.String(10))
 
-# 1. स्टूडेंट होम पेज (सिर्फ रिजल्ट सर्च - कोई एडमिन लिंक नहीं)
+
+# 1. स्टूडेंट होम पेज (सिर्फ रिजल्ट सर्च - कोई एडमिन लिंक या बटन नहीं)
 @app.route("/", methods=["GET", "POST"])
 def index():
     student = None
@@ -54,7 +71,8 @@ def index():
             
     return render_template("index.html", student=student, error=error, division=division)
 
-# 2. सीक्रेट एडमिन रूट (/admin) - यहीं से मार्क्स एंट्री और डिलीट होगा
+
+# 2. सीक्रेट एडमिन रूट (/admin) - मार्क्स एंट्री और डिलीट के लिए
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
     message = None
@@ -72,6 +90,7 @@ def admin():
             total = m + s + e + h + st
             per = round((total / 500) * 100, 2)
             
+            # यदि किसी भी सब्जेक्ट में 33 से कम हैं तो फेल
             if m < 33 or s < 33 or e < 33 or h < 33 or st < 33:
                 res_status = "FAIL"
             else:
@@ -96,10 +115,12 @@ def admin():
         except Exception as ex:
             message = f"❌ Error: डेटा सेव नहीं हुआ। डिटेल: {str(ex)}"
 
+    # डेटाबेस से सभी छात्रों की लिस्ट उठाना
     results = Student.query.all()
     return render_template("admin.html", message=message, results=results)
 
-# 3. डिलीट रूट
+
+# 3. छात्र रिकॉर्ड डिलीट करने का रूट
 @app.route("/delete/<roll_no>")
 def delete_student(roll_no):
     student = Student.query.filter_by(roll_no=roll_no).first()
@@ -108,7 +129,8 @@ def delete_student(roll_no):
         db.session.commit()
     return redirect(url_for('admin'))
 
+
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()  # डेटाबेस टेबल्स चेक/क्रिएट करना
+        db.create_all()  # रेलवे के Postgres में टेबल्स ऑटो-क्रिएट करना
     app.run(debug=True)
