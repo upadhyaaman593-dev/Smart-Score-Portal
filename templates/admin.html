@@ -1,43 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Dashboard</title>
+    <title>Teacher Dashboard - SmartScore</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { font-family: Arial; background: #f4f4f4; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 10px; max-width: 900px; margin: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        body { font-family: Arial, sans-serif; background: #eef2f3; padding: 20px; margin: 0; }
+        .main-container { max-width: 1000px; margin: auto; display: flex; flex-direction: column; gap: 20px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        input { width: 90%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        button { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; cursor: pointer; border-radius: 6px; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        button:hover { background: #219150; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
         th { background: #3498db; color: white; }
-        .btn-delete { background: #e74c3c; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; }
+        .btn-delete { background: #e74c3c; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: bold; }
+        .btn-delete:hover { background: #c0392b; }
+        .home-btn { display: inline-block; background: #2c3e50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-<div class="card">
-    {% if not authorized %}
-    <form method="POST" style="text-align:center; padding:50px;">
-        <h2>🔒 Admin Login</h2>
-        <input type="password" name="password" placeholder="Password" required><br><br>
-        <button type="submit" style="padding:10px 20px; background:green; color:white; border:none;">Login</button>
-    </form>
-    {% else %}
-    <h2>👨‍🏫 All Students Results</h2>
-    <div style="overflow-x:auto;">
-        <table>
-            <tr><th>Roll No</th><th>Name</th><th>Total</th><th>Percentage</th><th>Status</th><th>Action</th></tr>
-            {% for s in results %}
-            <tr>
-                <td>{{ s.roll_no }}</td>
-                <td>{{ s.name }}</td>
-                <td>{{ s.total }}</td>
-                <td>{{ s.percentage }}</td>
-                <td>{{ s.status }}</td>
-                <td><a href="/delete/{{ s.roll_no }}" class="btn-delete" onclick="return confirm('Delete karein?')">🗑️ Delete</a></td>
-            </tr>
-            {% endfor %}
-        </table>
+<div class="main-container">
+    <div>
+        <a href="/" class="home-btn">⬅️ Back to Student Result Page</a>
     </div>
-    {% endif %}
+
+    <div class="card">
+        <h2>📤 Enter / Update Student Marks</h2>
+        {% if message %}<p style="color:green; font-weight: bold;">{{ message }}</p>{% endif %}
+        <form method="POST">
+            <div class="form-grid">
+                <input type="text" name="roll_no" placeholder="Roll Number" required>
+                <input type="text" name="name" placeholder="Student Name" required>
+                <input type="number" name="maths" placeholder="Mathematics Marks" min="0" max="100" required>
+                <input type="number" name="science" placeholder="Science Marks" min="0" max="100" required>
+                <input type="number" name="english" placeholder="English Marks" min="0" max="100" required>
+                <input type="number" name="hindi" placeholder="Hindi Marks" min="0" max="100" required>
+                <input type="number" name="sst" placeholder="Social Science (SST)" min="0" max="100" required>
+            </div>
+            <button type="submit">🚀 Save Result permenantly</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>👨‍🏫 All Registered Student Results</h2>
+        <div style="overflow-x:auto;">
+            <table>
+                <tr>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Total (500)</th>
+                    <th>Percentage</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                {% for s in results %}
+                <tr>
+                    <td>{{ s.roll_no }}</td>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.total }}</td>
+                    <td>{{ s.percentage }}</td>
+                    <td>
+                        <span style="color: {{ 'green' if s.status == 'PASS' else 'red' }}; font-weight: bold;">
+                            {{ s.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="/delete/{{ s.roll_no }}" class="btn-delete" onclick="return confirm('क्या आप सच में इस छात्र का रिकॉर्ड डिलीट करना चाहते हैं?')">🗑️ Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: #7f8c8d;">डेटाबेस में अभी कोई रिकॉर्ड नहीं है। ऊपर फॉर्म से ऐड करें।</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
 </div>
 </body>
-                  </html>
+    </html>
