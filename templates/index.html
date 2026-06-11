@@ -14,37 +14,57 @@
         .marksheet { border: 2px solid #2c3e50; padding: 20px; border-radius: 10px; text-align: left; background: #fff; }
         table { width: 100%; border-collapse: collapse; margin: 15px 0; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        .division-box { text-align: center; font-size: 20px; font-weight: bold; padding: 10px; background: #f0f7ff; border-radius: 5px; }
+        .division-box { text-align: center; font-size: 20px; font-weight: bold; padding: 10px; background: #f0f7ff; border-radius: 5px; margin-top: 10px; }
         .pass { color: #27ae60; }
         .fail { color: #e74c3c; }
-        .print-btn { background: #2c3e50; width: 100%; margin-top: 20px; color: white; padding: 12px; border: none; cursor: pointer; }
-        @media print { form, .print-btn { display: none; } }
+        .print-btn { background: #2c3e50; width: 100%; margin-top: 20px; color: white; padding: 12px; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        .admin-link { display: inline-block; margin-top: 20px; color: #7f8c8d; text-decoration: none; font-size: 14px; }
+        @media print { form, .print-btn, .admin-link, .header p { display: none; } }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="header"><h1>SMARTSCORE ACADEMY</h1><p>Online Result Portal 2025-26</p></div>
+    <div class="header">
+        <h1>SMARTSCORE ACADEMY</h1>
+        <p>Online Result Portal 2025-26</p>
+    </div>
     <form method="POST">
         <input type="text" name="roll_no" placeholder="Enter Roll Number" required>
         <button type="submit">Search</button>
     </form>
-    {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+    
+    {% if error %}<p style="color:red; font-weight: bold;">{{ error }}</p>{% endif %}
+    
     {% if student %}
     <div class="marksheet">
-        <h2>Statement of Marks</h2>
-        <p><strong>Name:</strong> {{ student.name }} | <strong>Roll:</strong> {{ student.roll_no }}</p>
+        <h3 style="text-align: center; margin-top: 0; color: #2c3e50;">STATEMENT OF MARKS</h3>
+        <p><strong>Name:</strong> {{ student.name }}</p>
+        <p><strong>Roll Number:</strong> {{ student.roll_no }}</p>
         <table>
-            <tr><th>Subject</th><th>Marks</th></tr>
+            <tr><th>Subject</th><th>Marks Obtained (Max: 100)</th></tr>
             <tr><td>Mathematics</td><td>{{ student.maths }}</td></tr>
             <tr><td>Science</td><td>{{ student.science }}</td></tr>
             <tr><td>English</td><td>{{ student.english }}</td></tr>
             <tr><td>Hindi</td><td>{{ student.hindi }}</td></tr>
-            <tr><td>SST</td><td>{{ student.sst }}</td></tr>
+            <tr><td>Social Science (SST)</td><td>{{ student.sst }}</td></tr>
+            <tr style="background: #f9f9f9; font-weight: bold;">
+                <td>Total Marks</td>
+                <td>{{ student.total }} / 500</td>
+            </tr>
+            <tr style="background: #f9f9f9; font-weight: bold;">
+                <td>Percentage</td>
+                <td>{{ student.percentage }}</td>
+            </tr>
         </table>
-        <div class="division-box">Result: <span class="{{ 'pass' if student.status == 'PASS' else 'fail' }}">{{ division }}</span></div>
+        <div class="division-box">
+            Result Status: <span class="{{ 'pass' if student.status == 'PASS' else 'fail' }}">{{ division }}</span>
+        </div>
     </div>
-    <button class="print-btn" onclick="window.print()">Download Marksheet</button>
+    <button class="print-btn" onclick="window.print()">📥 Download Marksheet</button>
     {% endif %}
+    
+    <br>
+    <a href="/admin" class="admin-link">👨‍🏫 Teacher Dashboard</a>
 </div>
 </body>
-  </html>
+    </html>
