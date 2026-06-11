@@ -38,7 +38,7 @@
                 <input type="number" name="hindi" placeholder="Hindi Marks" min="0" max="100" required>
                 <input type="number" name="sst" placeholder="Social Science (SST)" min="0" max="100" required>
             </div>
-            <button type="submit">🚀 Save Result permenantly</button>
+            <button type="submit">🚀 Save Result permanently</button>
         </form>
     </div>
 
@@ -69,9 +69,9 @@
                         <a href="/delete/{{ s.roll_no }}" class="btn-delete" onclick="return confirm('क्या आप सच में इस छात्र का रिकॉर्ड डिलीट करना चाहते हैं?')">🗑️ Delete</a>
                     </td>
                 </tr>
-                {% empty %}
+                {% else %}
                 <tr>
-                    <td colspan="6" style="text-align: center; color: #7f8c8d;">डेटाबेस में अभी कोई रिकॉर्ड नहीं है। ऊपर फॉर्म से ऐड करें।</td>
+                    <td colspan="6" style="text-align: center; color: #7f8c8d;">डेटाबेस में अभी कोई रिकॉर्ड नहीं है।</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -79,4 +79,4 @@
     </div>
 </div>
 </body>
-    </html>
+</html>
